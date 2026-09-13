@@ -6,6 +6,8 @@ import { LoginPage } from './pages/Login'
 import { DashboardPage } from './pages/Dashboard'
 import { ChartOfAccountsPage } from './pages/ChartOfAccounts'
 import { JournalEntriesPage } from './pages/JournalEntries'
+import { SalesPage } from './pages/Sales'
+import { PurchasesPage } from './pages/Purchases'
 import { FinancialStatementsPage } from './pages/FinancialStatements'
 import { AdminDashboardPage } from './pages/admin/AdminDashboard'
 import { AdminFirmsPage } from './pages/admin/AdminFirms'
@@ -15,12 +17,14 @@ import { AdminAuditLogPage } from './pages/admin/AdminAuditLog'
 import { AdminSettingsPage } from './pages/admin/AdminSettings'
 
 type View = 'home' | 'login' | 'app' | 'superadmin'
-type Page = 'dashboard' | 'accounts' | 'journal' | 'statements'
+type Page = 'dashboard' | 'accounts' | 'journal' | 'sales' | 'purchases' | 'statements'
 type AdminPage = 'dashboard' | 'firms' | 'users' | 'subscriptions' | 'audit' | 'settings'
 
 const CPA_NAV: { key: Page; label: string }[] = [
   { key: 'dashboard', label: 'Dashboard' },
   { key: 'journal', label: 'Journal Entries' },
+  { key: 'sales', label: 'Sales' },
+  { key: 'purchases', label: 'Purchases' },
   { key: 'accounts', label: 'Chart of Accounts' },
   { key: 'statements', label: 'Financial Statements' },
 ]
@@ -93,6 +97,8 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
       <main className="max-w-5xl flex-1 p-8">
         {page === 'dashboard' && <DashboardPage />}
         {page === 'journal' && <JournalEntriesPage />}
+        {page === 'sales' && <SalesPage />}
+        {page === 'purchases' && <PurchasesPage />}
         {page === 'accounts' && <ChartOfAccountsPage />}
         {page === 'statements' && <FinancialStatementsPage />}
       </main>

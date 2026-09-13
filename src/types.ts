@@ -41,3 +41,29 @@ export interface TenantUser {
   role: 'Admin' | 'Accountant' | 'Viewer'
   email: string
 }
+
+export interface Sale {
+  id: string
+  invoiceNo: string
+  date: string
+  customer: string
+  saleType: 'goods' | 'services'
+  vatType: 'vatable' | 'vat-exempt' | 'zero-rated' | 'non-vat'
+  netAmount: number
+  status: 'paid' | 'unpaid'
+}
+
+export interface Purchase {
+  id: string
+  refNo: string
+  date: string
+  supplier: string
+  /** Chart of accounts code for the expense/inventory account to debit */
+  expenseAccount: string
+  vatType: 'vatable' | 'non-vat'
+  netAmount: number
+  /** Creditable withholding rate applied by us as payer, e.g. 0, 0.05, 0.10 */
+  ewtRate: number
+  status: 'paid' | 'unpaid'
+}
+
