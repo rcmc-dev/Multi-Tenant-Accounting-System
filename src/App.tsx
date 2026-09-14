@@ -56,21 +56,24 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
           <select
             className="cursor-pointer rounded-lg border border-brand-800 bg-brand-800 px-3 py-2 text-sm text-white"
             value={tenant.id}
-            onChange={(e) => setTenantId(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value === '__new__') {
+                // Keep the current client selected; the modal takes over from here
+                e.target.value = tenant.id
+                setShowNewClient(true)
+                return
+              }
+              setTenantId(e.target.value)
+            }}
           >
-            {tenants.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
+            <optgroup label="Clients">
+              {tenants.map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </optgroup>
+            <option value="__new__">+ Add new client…</option>
           </select>
         </label>
-
-        <button
-          className="cursor-pointer rounded-lg border border-brand-800 py-2 text-sm font-medium text-slate-300 transition hover:bg-brand-800 hover:text-white"
-          onClick={() => setShowNewClient(true)}
-          title="Onboard a new client with empty books"
-        >
-          + New Client
-        </button>
 
         <nav className="flex flex-1 flex-col gap-1">
           {CPA_NAV.map((n) => (
