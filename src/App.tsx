@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { TenantProvider, useTenant } from './context/TenantContext'
 import { Brand } from './components/Brand'
-import { NewClientModal } from './components/NewClientModal'
+import { ClientSettingsPage } from './pages/ClientSettings'
 import { HomePage } from './pages/Home'
 import { LoginPage } from './pages/Login'
 import { DashboardPage } from './pages/Dashboard'
@@ -18,7 +18,7 @@ import { AdminAuditLogPage } from './pages/admin/AdminAuditLog'
 import { AdminSettingsPage } from './pages/admin/AdminSettings'
 
 type View = 'home' | 'login' | 'app' | 'superadmin'
-type Page = 'dashboard' | 'accounts' | 'journal' | 'sales' | 'purchases' | 'statements'
+type Page = 'dashboard' | 'accounts' | 'journal' | 'sales' | 'purchases' | 'statements' | 'settings'
 type AdminPage = 'dashboard' | 'firms' | 'users' | 'subscriptions' | 'audit' | 'settings'
 
 const CPA_NAV: { key: Page; label: string }[] = [
@@ -28,6 +28,7 @@ const CPA_NAV: { key: Page; label: string }[] = [
   { key: 'purchases', label: 'Purchases' },
   { key: 'accounts', label: 'Chart of Accounts' },
   { key: 'statements', label: 'Financial Statements' },
+  { key: 'settings', label: 'Client Settings' },
 ]
 
 const ADMIN_NAV: { key: AdminPage; label: string }[] = [
@@ -42,7 +43,6 @@ const ADMIN_NAV: { key: AdminPage; label: string }[] = [
 function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void }) {
   const { tenant, tenants, setTenantId, userName } = useTenant()
   const [page, setPage] = useState<Page>('dashboard')
-  const [showNewClient, setShowNewClient] = useState(false)
 
   return (
     <div className="flex min-h-screen">
@@ -56,22 +56,11 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
           <select
             className="cursor-pointer rounded-lg border border-brand-800 bg-brand-800 px-3 py-2 text-sm text-white"
             value={tenant.id}
-            onChange={(e) => {
-              if (e.target.value === '__new__') {
-                // Keep the current client selected; the modal takes over from here
-                e.target.value = tenant.id
-                setShowNewClient(true)
-                return
-              }
-              setTenantId(e.target.value)
-            }}
+            onChange={(e) => setTenantId(e.target.value)}
           >
-            <optgroup label="Clients">
-              {tenants.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </optgroup>
-            <option value="__new__">+ Add new client…</option>
+            {tenants.map((t) => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
           </select>
         </label>
 
@@ -114,9 +103,8 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
         {page === 'purchases' && <PurchasesPage />}
         {page === 'accounts' && <ChartOfAccountsPage />}
         {page === 'statements' && <FinancialStatementsPage />}
+        {page === 'settings' && <ClientSettingsPage key={tenant.id} />}
       </main>
-
-      {showNewClient && <NewClientModal onClose={() => setShowNewClient(false)} />}
     </div>
   )
 }

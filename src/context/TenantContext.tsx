@@ -19,6 +19,8 @@ interface TenantContextValue {
   addPurchase: (purchase: Purchase) => void
   /** Creates a new client (tenant) with empty books, persists it, and switches to it */
   addTenant: (input: NewTenantInput) => Tenant
+  /** Updates an existing client's registration details (name, TIN, RDO, VAT, fiscal year) */
+  updateTenant: (id: string, input: NewTenantInput) => void
 }
 
 const TenantContext = createContext<TenantContextValue | null>(null)
@@ -44,6 +46,11 @@ function saveCustomTenants(custom: Tenant[]) {
   }
 }
 
+/** Stores only in-app created clients (built-in demo clients stay untouched on disk) */
+function persistTenants(list: Tenant[]) {
+  saveCustomTenants(list.filter((t) => !DEMO_TENANTS.some((d) => d.id === t.id)))
+}
+
 const initialsFromName = (name: string) =>
   (name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2) || 'CL').toUpperCase()
 
@@ -52,13 +59,12 @@ const slugFromName = (name: string) =>
 
 export function TenantProvider({ children, userName }: { children: ReactNode; userName: string }) {
   const [tenantId, setTenantId] = useState(DEMO_TENANTS[0].id)
-  const [customTenants, setCustomTenants] = useState<Tenant[]>(loadCustomTenants)
+  // Demo books plus clients created in-app; edits to any client's details live here
+  const [tenants, setTenants] = useState<Tenant[]>(() => [...DEMO_TENANTS, ...loadCustomTenants()])
   const [allEntries, setAllEntries] = useState<Record<string, JournalEntry[]>>(JOURNAL_ENTRIES)
   const [allSales, setAllSales] = useState<Record<string, Sale[]>>(SALES)
   const [allPurchases, setAllPurchases] = useState<Record<string, Purchase[]>>(PURCHASES)
 
-  // Demo books plus clients created in-app via the New Client modal
-  const tenants = useMemo(() => [...DEMO_TENANTS, ...customTenants], [customTenants])
   const tenant = tenants.find((t) => t.id === tenantId) ?? tenants[0]
 
   const addEntry = useCallback(
@@ -111,9 +117,9 @@ export function TenantProvider({ children, userName }: { children: ReactNode; us
       fiscalYearStart: input.fiscalYearStart,
       logoInitials: initialsFromName(name),
     }
-    setCustomTenants((prev) => {
+    setTenants((prev) => {
       const next = [...prev, newTenant]
-      saveCustomTenants(next)
+      persistTenants(next)
       return next
     })
     // Fresh, empty books for the new client
@@ -122,6 +128,28 @@ export function TenantProvider({ children, userName }: { children: ReactNode; us
     setAllPurchases((prev) => ({ ...prev, [newTenant.id]: [] }))
     setTenantId(newTenant.id)
     return newTenant
+  }, [])
+
+  const updateTenant = useCallback((id: string, input: NewTenantInput) => {
+    setTenants((prev) => {
+      // Keep the id stable so this client's books/sales/purchases stay attached
+      const next = prev.map((t) =>
+        t.id === id
+          ? {
+              ...t,
+              name: input.name.trim(),
+              industry: input.industry.trim() || t.industry,
+              rdoCode: input.rdoCode.trim(),
+              tin: input.tin.trim(),
+              vatType: input.vatType,
+              fiscalYearStart: input.fiscalYearStart,
+              logoInitials: initialsFromName(input.name),
+            }
+          : t,
+      )
+      persistTenants(next)
+      return next
+    })
   }, [])
 
   const value = useMemo<TenantContextValue>(
@@ -137,8 +165,9 @@ export function TenantProvider({ children, userName }: { children: ReactNode; us
       addSale,
       addPurchase,
       addTenant,
+      updateTenant,
     }),
-    [tenant, tenants, allEntries, allSales, allPurchases, tenantId, userName, addEntry, addSale, addPurchase, addTenant],
+    [tenant, tenants, allEntries, allSales, allPurchases, tenantId, userName, addEntry, addSale, addPurchase, addTenant, updateTenant],
   )
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>
