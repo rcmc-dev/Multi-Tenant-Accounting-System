@@ -1,15 +1,29 @@
 import { useState } from 'react'
+import { usePlatformSettings, type PlatformPlan } from '../../context/PlatformSettingsContext'
 
 export function AdminSettingsPage() {
-  const [platformName, setPlatformName] = useState('KitaBooks')
-  const [vatRate, setVatRate] = useState('12')
-  const [defaultPlan, setDefaultPlan] = useState('Solo CPA')
-  const [maintenance, setMaintenance] = useState(false)
-  const [newSignups, setNewSignups] = useState(true)
+  const { settings, updateSettings } = usePlatformSettings()
+  const [platformName, setPlatformName] = useState(settings.platformName)
+  const [vatRate, setVatRate] = useState(settings.vatRate)
+  const [defaultPlan, setDefaultPlan] = useState<PlatformPlan>(settings.defaultPlan)
+  const [maintenance, setMaintenance] = useState(settings.maintenanceMode)
+  const [newSignups, setNewSignups] = useState(settings.allowNewSignups)
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const save = () => {
-    // Mock save — persistence arrives with the backend.
+    if (!platformName.trim()) return setError('Platform name is required.')
+    const rate = Number(vatRate)
+    if (!Number.isFinite(rate) || rate < 0) return setError('Standard VAT rate must be a number ≥ 0.')
+    setError(null)
+    // Applies instantly across the whole app; persists locally until the backend milestone
+    updateSettings({
+      platformName: platformName.trim(),
+      vatRate: String(rate),
+      defaultPlan,
+      maintenanceMode: maintenance,
+      allowNewSignups: newSignups,
+    })
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
@@ -20,7 +34,7 @@ export function AdminSettingsPage() {
   return (
     <div>
       <h1 className="m-0 text-2xl font-bold">System Settings</h1>
-      <p className="mt-1.5 mb-6 text-sm text-slate-500">Platform-wide configuration.</p>
+      <p className="mt-1.5 mb-6 text-sm text-slate-500">Platform-wide configuration — applies to every firm and client instantly.</p>
 
       <div className="card-tile mb-4">
         <div className="mb-4 text-xs font-semibold tracking-wider text-slate-500 uppercase">General</div>
@@ -47,7 +61,7 @@ export function AdminSettingsPage() {
             <select
               className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-normal focus:outline-2 focus:outline-brand-600"
               value={defaultPlan}
-              onChange={(e) => setDefaultPlan(e.target.value)}
+              onChange={(e) => setDefaultPlan(e.target.value as PlatformPlan)}
             >
               <option>Solo CPA</option>
               <option>Firm</option>
@@ -79,10 +93,15 @@ export function AdminSettingsPage() {
         </div>
       </div>
 
+      {error && <p className="mt-3 mb-0 text-sm text-red-700">{error}</p>}
+
       <div className="flex items-center gap-3">
         <button className="btn-primary" onClick={save}>Save Settings</button>
-        {saved && <span className="text-sm font-medium text-green-700">✅ Settings saved (demo).</span>}
+        {saved && <span className="text-sm font-medium text-green-700">✅ Settings saved — applied across the app.</span>}
       </div>
+      <p className="mt-3 mb-0 text-xs text-slate-500">
+        Saved to this browser (localStorage) for the demo; real cross-device sync arrives with the backend.
+      </p>
     </div>
   )
 }

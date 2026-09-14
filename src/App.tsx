@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { TenantProvider, useTenant } from './context/TenantContext'
 import { Brand } from './components/Brand'
+import { MaintenanceScreen } from './components/MaintenanceScreen'
+import { PlatformSettingsProvider, usePlatformSettings } from './context/PlatformSettingsContext'
 import { ClientSettingsPage } from './pages/ClientSettings'
 import { HomePage } from './pages/Home'
 import { LoginPage } from './pages/Login'
@@ -111,13 +113,14 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
 
 function SuperAdminShell({ onHome, onLogout, userName }: { onHome: () => void; onLogout: () => void; userName: string }) {
   const [page, setPage] = useState<AdminPage>('dashboard')
+  const { settings } = usePlatformSettings()
 
   return (
     <div className="flex min-h-screen bg-slate-100">
       <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col gap-6 bg-slate-900 p-5 text-slate-400">
         <div>
           <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-amber-400 text-xl font-bold text-slate-900">₱</span>
-          <div className="mt-2 font-bold text-white">KitaBooks Platform</div>
+          <div className="mt-2 font-bold text-white">{settings.platformName} Platform</div>
           <div className="text-[0.7rem] tracking-widest uppercase">Super Admin Console</div>
         </div>
 
@@ -169,11 +172,39 @@ function SuperAdminShell({ onHome, onLogout, userName }: { onHome: () => void; o
 }
 
 export default function App() {
+  return (
+    <PlatformSettingsProvider>
+      <AppRoot />
+    </PlatformSettingsProvider>
+  )
+}
+
+function AppRoot() {
+  const { settings } = usePlatformSettings()
   const [view, setView] = useState<View>('home')
   const [userName, setUserName] = useState<string | null>(null)
 
   if (view === 'home') {
     return <HomePage onLogin={() => setView('login')} onEnterApp={() => setView('app')} />
+  }
+
+  // The platform admin console stays reachable during maintenance
+  if (view === 'superadmin') {
+    return (
+      <SuperAdminShell
+        userName={userName ?? 'Ramon Dela Cruz'}
+        onHome={() => setView('home')}
+        onLogout={() => {
+          setUserName(null)
+          setView('home')
+        }}
+      />
+    )
+  }
+
+  // Maintenance mode closes non-admin surfaces (login + the CPA app)
+  if (settings.maintenanceMode) {
+    return <MaintenanceScreen onBack={() => setView('home')} />
   }
 
   if (view === 'login') {
@@ -184,19 +215,6 @@ export default function App() {
           setView(r === 'superadmin' ? 'superadmin' : 'app')
         }}
         onBack={() => setView('home')}
-      />
-    )
-  }
-
-  if (view === 'superadmin') {
-    return (
-      <SuperAdminShell
-        userName={userName ?? 'Ramon Dela Cruz'}
-        onHome={() => setView('home')}
-        onLogout={() => {
-          setUserName(null)
-          setView('home')
-        }}
       />
     )
   }

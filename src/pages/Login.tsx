@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { usePlatformSettings } from '../context/PlatformSettingsContext'
 
 const SUPERADMIN_EMAIL = 'superadmin@kitabooks.ph'
 const SUPERADMIN_TEMP_PASSWORD = 'KitaAdmin#2026'
@@ -13,6 +14,7 @@ export function LoginPage({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const { settings } = usePlatformSettings()
 
   const submit = (e2: React.FormEvent) => {
     e2.preventDefault()
@@ -54,7 +56,12 @@ export function LoginPage({
           <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-accent text-xl font-bold text-brand-900">₱</span>
         </div>
         <h1 className="text-xl font-bold">Welcome back</h1>
-        <p className="mt-1 mb-6 text-sm text-slate-500">Sign in to manage your clients' books.</p>
+        <p className="mt-1 mb-6 text-sm text-slate-500">Sign in to {settings.platformName} to manage your clients' books.</p>
+        {!settings.allowNewSignups && (
+          <div className="mb-4 rounded-xl border border-amber-400 bg-amber-50 p-3 text-xs text-amber-900">
+            🚧 New firm signups are paused by the platform admin. Existing users can still sign in.
+          </div>
+        )}
         <form onSubmit={submit}>
           <label className="mb-4 flex flex-col gap-1 text-xs font-semibold text-slate-500">
             Email

@@ -1,12 +1,15 @@
 import { Brand } from '../components/Brand'
 import { SupportChat } from '../components/SupportChat'
+import { usePlatformSettings } from '../context/PlatformSettingsContext'
 
 export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnterApp: () => void }) {
+  const { settings } = usePlatformSettings()
+
   return (
     <div className="bg-white">
       {/* Top bar */}
       <header className="sticky top-0 z-10 flex items-center gap-8 border-b border-gray-200 bg-white/90 px-[4vw] py-4 backdrop-blur">
-        <Brand />
+        <Brand nameCls="text-slate-800" />
         <nav className="hidden flex-1 justify-center gap-6 md:flex">
           {[
             ['#features', 'Features'],
@@ -35,7 +38,7 @@ export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnter
           BIR-compliant, peso-perfect.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-500">
-          KitaBooks is the multi-tenant accounting platform for Philippine practitioners.
+          {settings.platformName} is the multi-tenant accounting platform for Philippine practitioners.
           Handle VAT, withholding taxes, and BIR forms across every client you serve —
           without switching spreadsheets.
         </p>
@@ -117,6 +120,11 @@ export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnter
                   {p.tag}
                 </span>
               )}
+              {p.name === settings.defaultPlan && (
+                <span className="absolute -top-3 right-6 rounded-full bg-brand-600 px-3 py-1 text-xs font-bold text-white">
+                  Default for new firms
+                </span>
+              )}
               <h3 className="m-0 text-sm font-medium text-slate-500">{p.name}</h3>
               <div className="mt-2 mb-4 text-4xl font-extrabold">
                 {p.price}
@@ -156,9 +164,9 @@ export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnter
       </section>
 
       <footer className="border-t border-gray-200 px-[4vw] py-10 text-center">
-        <div className="flex justify-center"><Brand /></div>
+        <div className="flex justify-center"><Brand nameCls="text-slate-800" /></div>
         <p className="mt-4 text-xs text-slate-500">
-          © 2026 KitaBooks · Made for Filipino accountants 🇵🇭 · Demo build — not yet BIR-accredited software.
+          © 2026 {settings.platformName} · Made for Filipino accountants 🇵🇭 · Demo build — not yet BIR-accredited software.
         </p>
       </footer>
 

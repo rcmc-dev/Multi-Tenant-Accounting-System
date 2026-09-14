@@ -1,7 +1,9 @@
 import { AUDIT_EVENTS, MONTHLY_REVENUE, PLATFORM_FIRMS } from '../../data/platformData'
+import { usePlatformSettings } from '../../context/PlatformSettingsContext'
 import { formatPeso } from '../../lib/accounting'
 
 export function AdminDashboardPage() {
+  const { settings } = usePlatformSettings()
   const totalMrr = PLATFORM_FIRMS.filter((f) => f.status === 'active').reduce((s, f) => s + f.mrr, 0)
   const activeFirms = PLATFORM_FIRMS.filter((f) => f.status === 'active').length
   const trialFirms = PLATFORM_FIRMS.filter((f) => f.status === 'trial').length
@@ -18,7 +20,7 @@ export function AdminDashboardPage() {
   return (
     <div>
       <h1 className="m-0 text-2xl font-bold">Platform Dashboard</h1>
-      <p className="mt-1.5 mb-6 text-sm text-slate-500">KitaBooks platform overview · March 2026</p>
+      <p className="mt-1.5 mb-6 text-sm text-slate-500">{settings.platformName} platform overview · March 2026</p>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
         {stats.map((s) => (
