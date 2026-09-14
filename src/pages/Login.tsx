@@ -3,6 +3,8 @@ import { usePlatformSettings } from '../context/PlatformSettingsContext'
 
 const SUPERADMIN_EMAIL = 'superadmin@kitabooks.ph'
 const SUPERADMIN_TEMP_PASSWORD = 'KitaAdmin#2026'
+const DEMO_CPA_EMAIL = 'maria@santoscpa.ph'
+const DEMO_CPA_PASSWORD = 'KitaDemo#2026'
 
 export function LoginPage({
   onSuccess,
@@ -37,6 +39,12 @@ export function LoginPage({
   const fillSuperAdmin = () => {
     setEmail(SUPERADMIN_EMAIL)
     setPassword(SUPERADMIN_TEMP_PASSWORD)
+    setError(null)
+  }
+
+  const fillDemoCpa = () => {
+    setEmail(DEMO_CPA_EMAIL)
+    setPassword(DEMO_CPA_PASSWORD)
     setError(null)
   }
 
@@ -88,6 +96,19 @@ export function LoginPage({
           <button type="submit" className="btn-primary w-full py-2.5">Sign In</button>
         </form>
 
+        <div className="mt-5 rounded-xl border border-dashed border-brand-600 bg-brand-50 p-3.5 text-xs text-brand-900">
+          <div className="font-bold">👤 CPA / Bookkeeper demo account</div>
+          <div className="mt-1 font-mono">Email: {DEMO_CPA_EMAIL}</div>
+          <div className="font-mono">Password: {DEMO_CPA_PASSWORD}</div>
+          <button
+            type="button"
+            className="mt-2 cursor-pointer rounded-md bg-brand-600 px-2.5 py-1 font-semibold text-white hover:bg-brand-700"
+            onClick={fillDemoCpa}
+          >
+            Fill credentials for me
+          </button>
+        </div>
+
         <div className="mt-5 rounded-xl border border-dashed border-amber-400 bg-amber-50 p-3.5 text-xs text-amber-900">
           <div className="font-bold">🔐 Super Admin (temporary access)</div>
           <div className="mt-1 font-mono">Email: {SUPERADMIN_EMAIL}</div>
@@ -102,8 +123,8 @@ export function LoginPage({
         </div>
 
         <p className="mt-4 text-xs text-slate-400">
-          CPA demo: any other email/password signs you in. Real authentication arrives with the backend —
-          the temp super admin password above should be rotated on first login.
+          Demo auth: any other email/password signs you in as a CPA, too. Real authentication arrives with the
+          backend — the temp super admin password above should be rotated on first login.
         </p>
         </div>
       </div>
