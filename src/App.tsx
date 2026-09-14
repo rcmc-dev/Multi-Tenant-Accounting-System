@@ -203,7 +203,7 @@ function AppRoot() {
   const [userName, setUserName] = useState<string | null>(null)
 
   if (view === 'home') {
-    return <HomePage onLogin={() => setView('login')} onEnterApp={() => setView('app')} />
+    return <HomePage onLogin={() => setView('login')} />
   }
 
   // The platform admin console stays reachable during maintenance

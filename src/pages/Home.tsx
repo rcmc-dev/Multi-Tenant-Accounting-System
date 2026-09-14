@@ -2,7 +2,7 @@ import { Brand } from '../components/Brand'
 import { SupportChat } from '../components/SupportChat'
 import { usePlatformSettings } from '../context/PlatformSettingsContext'
 
-export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnterApp: () => void }) {
+export function HomePage({ onLogin }: { onLogin: () => void }) {
   const { settings } = usePlatformSettings()
 
   return (
@@ -23,8 +23,7 @@ export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnter
           ))}
         </nav>
         <div className="ml-auto flex gap-2.5 md:ml-0">
-          <button className="btn-ghost" onClick={onLogin}>Log in</button>
-          <button className="btn-primary" onClick={onEnterApp}>Try the Demo</button>
+          <button className="btn-primary" onClick={onLogin}>Log in</button>
         </div>
       </header>
 
@@ -43,7 +42,7 @@ export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnter
           without switching spreadsheets.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <button className="btn-primary btn-lg" onClick={onEnterApp}>Open Live Demo →</button>
+          <button className="btn-primary btn-lg" onClick={onLogin}>Try the Live Demo — Log In →</button>
           <a className="btn-ghost btn-lg" href="#features">See Features</a>
         </div>
         <div className="mt-14 flex flex-wrap justify-center gap-12">
@@ -73,6 +72,9 @@ export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnter
             ['📈', 'One-Click Statements', 'Trial balance, income statement, and balance sheet generated from the ledger in real time — no more month-end spreadsheet gymnastics.'],
             ['🏛️', 'BIR 2550 VAT Summary', 'Net VAT payable computed per BIR Form 2550M/2550Q logic, with due-date reminders for EFPS/eBIR filing.'],
             ['👥', 'Role-Based Team Access', 'Admin, Accountant, and Viewer roles per client — let your staff and clients see exactly what they should. (Coming soon)'],
+            ['➕', 'Client Onboarding & Settings', 'Add a new client in seconds — name, TIN, RDO code, VAT type, fiscal year — and re-edit their registration details anytime from Client Settings. New clients start with fresh books.'],
+            ['⚙️', 'Super Admin Control Center', 'Firms, users, subscriptions, invoices, and audit trail in one console — with system settings that rebrand the platform and toggle maintenance or signups instantly.'],
+            ['📱', 'Works on Any Device', 'Full experience on desktop, tap-friendly on mobile — the sidebar collapses into a hamburger drawer so your books travel with you.'],
           ].map(([icon, title, desc]) => (
             <div key={title} className="rounded-2xl border border-gray-200 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-lg">
               <div className="text-2xl">{icon}</div>
@@ -159,8 +161,8 @@ export function HomePage({ onLogin, onEnterApp }: { onLogin: () => void; onEnter
       {/* CTA */}
       <section className="mt-16 bg-brand-50 px-[4vw] py-18 text-center">
         <h2 className="m-0 text-3xl font-bold">Ready to modernize your practice?</h2>
-        <p className="mt-2.5 mb-6 text-slate-500">Try the live demo — three client books, fully working ledger.</p>
-        <button className="btn-primary btn-lg" onClick={onEnterApp}>Open the Demo →</button>
+        <p className="mt-2.5 mb-6 text-slate-500">Three demo client books and a fully working ledger — one tap away on the login screen.</p>
+        <button className="btn-primary btn-lg" onClick={onLogin}>Try the Demo — Log In →</button>
       </section>
 
       <footer className="border-t border-gray-200 px-[4vw] py-10 text-center">
