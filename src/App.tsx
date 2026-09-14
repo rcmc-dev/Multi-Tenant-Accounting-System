@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TenantProvider, useTenant } from './context/TenantContext'
 import { Brand } from './components/Brand'
+import { AppShell } from './components/AppShell'
 import { MaintenanceScreen } from './components/MaintenanceScreen'
 import { PlatformSettingsProvider, usePlatformSettings } from './context/PlatformSettingsContext'
 import { ClientSettingsPage } from './pages/ClientSettings'
@@ -47,8 +48,12 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
   const [page, setPage] = useState<Page>('dashboard')
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col gap-6 bg-brand-900 p-5 text-slate-400">
+    <AppShell
+      activeKey={page}
+      asideClassName="bg-brand-900"
+      topBar={<Brand nameCls="text-slate-800" />}
+      aside={
+        <>
         <button className="cursor-pointer text-left" onClick={onHome} title="Back to homepage">
           <Brand />
         </button>
@@ -97,8 +102,10 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
         >
           Log out
         </button>
-      </aside>
-      <main className="flex-1 p-8">
+        </>
+      }
+    >
+      <main className="p-4 md:p-8">
         {page === 'dashboard' && <DashboardPage />}
         {page === 'journal' && <JournalEntriesPage />}
         {page === 'sales' && <SalesPage />}
@@ -107,7 +114,7 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
         {page === 'statements' && <FinancialStatementsPage />}
         {page === 'settings' && <ClientSettingsPage key={tenant.id} />}
       </main>
-    </div>
+    </AppShell>
   )
 }
 
@@ -116,8 +123,17 @@ function SuperAdminShell({ onHome, onLogout, userName }: { onHome: () => void; o
   const { settings } = usePlatformSettings()
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col gap-6 bg-slate-900 p-5 text-slate-400">
+    <AppShell
+      activeKey={page}
+      asideClassName="bg-slate-900"
+      topBar={
+        <div className="flex items-center gap-2">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-400 text-lg font-bold text-slate-900">₱</span>
+          <span className="font-bold text-slate-800">{settings.platformName}</span>
+        </div>
+      }
+      aside={
+        <>
         <div>
           <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-amber-400 text-xl font-bold text-slate-900">₱</span>
           <div className="mt-2 font-bold text-white">{settings.platformName} Platform</div>
@@ -158,8 +174,10 @@ function SuperAdminShell({ onHome, onLogout, userName }: { onHome: () => void; o
         <button className="cursor-pointer text-center text-xs text-slate-500 hover:text-slate-300" onClick={onHome}>
           ← kitabooks.ph homepage
         </button>
-      </aside>
-      <main className="flex-1 p-8">
+        </>
+      }
+    >
+      <main className="p-4 md:p-8">
         {page === 'dashboard' && <AdminDashboardPage />}
         {page === 'firms' && <AdminFirmsPage />}
         {page === 'users' && <AdminUsersPage />}
@@ -167,7 +185,7 @@ function SuperAdminShell({ onHome, onLogout, userName }: { onHome: () => void; o
         {page === 'audit' && <AdminAuditLogPage />}
         {page === 'settings' && <AdminSettingsPage />}
       </main>
-    </div>
+    </AppShell>
   )
 }
 
