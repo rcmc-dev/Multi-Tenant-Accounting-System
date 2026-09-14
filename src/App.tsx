@@ -94,7 +94,7 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
           Log out
         </button>
       </aside>
-      <main className="max-w-5xl flex-1 p-8">
+      <main className="flex-1 p-8">
         {page === 'dashboard' && <DashboardPage />}
         {page === 'journal' && <JournalEntriesPage />}
         {page === 'sales' && <SalesPage />}
@@ -153,7 +153,7 @@ function SuperAdminShell({ onHome, onLogout, userName }: { onHome: () => void; o
           ← kitabooks.ph homepage
         </button>
       </aside>
-      <main className="max-w-5xl flex-1 p-8">
+      <main className="flex-1 p-8">
         {page === 'dashboard' && <AdminDashboardPage />}
         {page === 'firms' && <AdminFirmsPage />}
         {page === 'users' && <AdminUsersPage />}

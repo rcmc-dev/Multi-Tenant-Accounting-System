@@ -18,7 +18,7 @@ export function AdminSettingsPage() {
     `relative h-6 w-11 cursor-pointer rounded-full transition ${on ? 'bg-brand-600' : 'bg-gray-300'}`
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <h1 className="m-0 text-2xl font-bold">System Settings</h1>
       <p className="mt-1.5 mb-6 text-sm text-slate-500">Platform-wide configuration.</p>
 
