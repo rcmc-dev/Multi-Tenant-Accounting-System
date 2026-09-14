@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TenantProvider, useTenant } from './context/TenantContext'
 import { Brand } from './components/Brand'
+import { NewClientModal } from './components/NewClientModal'
 import { HomePage } from './pages/Home'
 import { LoginPage } from './pages/Login'
 import { DashboardPage } from './pages/Dashboard'
@@ -41,6 +42,7 @@ const ADMIN_NAV: { key: AdminPage; label: string }[] = [
 function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void }) {
   const { tenant, tenants, setTenantId, userName } = useTenant()
   const [page, setPage] = useState<Page>('dashboard')
+  const [showNewClient, setShowNewClient] = useState(false)
 
   return (
     <div className="flex min-h-screen">
@@ -61,6 +63,14 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
             ))}
           </select>
         </label>
+
+        <button
+          className="cursor-pointer rounded-lg border border-brand-800 py-2 text-sm font-medium text-slate-300 transition hover:bg-brand-800 hover:text-white"
+          onClick={() => setShowNewClient(true)}
+          title="Onboard a new client with empty books"
+        >
+          + New Client
+        </button>
 
         <nav className="flex flex-1 flex-col gap-1">
           {CPA_NAV.map((n) => (
@@ -102,6 +112,8 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
         {page === 'accounts' && <ChartOfAccountsPage />}
         {page === 'statements' && <FinancialStatementsPage />}
       </main>
+
+      {showNewClient && <NewClientModal onClose={() => setShowNewClient(false)} />}
     </div>
   )
 }

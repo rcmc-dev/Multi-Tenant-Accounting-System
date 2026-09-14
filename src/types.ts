@@ -36,6 +36,16 @@ export interface Tenant {
   logoInitials: string
 }
 
+/** Payload used when a bookkeeper/CPA onboards a new client (tenant) in the app */
+export interface NewTenantInput {
+  name: string
+  industry: string
+  tin: string
+  rdoCode: string
+  vatType: 'vatable' | 'non-vat'
+  fiscalYearStart: string
+}
+
 export interface TenantUser {
   name: string
   role: 'Admin' | 'Accountant' | 'Viewer'
