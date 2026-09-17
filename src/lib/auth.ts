@@ -36,7 +36,7 @@ function friendlyAuthError(message: string): string {
 }
 
 /** Creates the profile row on first sign-in; keeps the platform admin role in sync */
-async function ensureProfile(userId: string, email: string): Promise<ProfileRow> {
+async function ensureProfile(userId: string, email: string, fullNameOverride?: string): Promise<ProfileRow> {
   const { data } = await supabase!.from('profiles').select('*').eq('id', userId).maybeSingle()
   const isAdminEmail = email.toLowerCase() === SUPERADMIN_EMAIL
 
@@ -52,7 +52,7 @@ async function ensureProfile(userId: string, email: string): Promise<ProfileRow>
   const row: ProfileRow = {
     id: userId,
     email,
-    full_name: role === 'superadmin' ? 'Ramon Dela Cruz' : email.split('@')[0] || 'User',
+    full_name: role === 'superadmin' ? 'Ramon Dela Cruz' : fullNameOverride?.trim() || email.split('@')[0] || 'User',
     role,
     firm_id: role === 'superadmin' ? null : DEMO_FIRM_ID,
   }
@@ -97,3 +97,37 @@ export async function signOutUser(): Promise<void> {
 
 /** Exposed for diagnostics/UX hints */
 export const isSupabaseAuthConfigured = isSupabaseConfigured
+
+export interface SignUpResult {
+  /** Signed-in user when the account was confirmed instantly; null when email confirmation is pending */
+  user: AuthUser | null
+  needsEmailConfirmation: boolean
+}
+
+function friendlySignUpError(message: string): string {
+  if (/already registered|already exists/i.test(message)) {
+    return 'An account with this email already exists — sign in instead.'
+  }
+  return message
+}
+
+/** Registers a new CPA/bookkeeper account (Supabase when configured; instant mock session otherwise) */
+export async function signUp(email: string, password: string, fullName: string): Promise<SignUpResult> {
+  if (!supabase) return { user: mockSignIn(email, password), needsEmailConfirmation: false }
+
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim(),
+    password,
+    options: { data: { full_name: fullName.trim() || 'User' } },
+  })
+  if (error || !data.user) throw new Error(friendlySignUpError(error?.message ?? 'Sign-up failed.'))
+
+  // Session right away → email confirmation is OFF, log the user in directly
+  if (data.session) {
+    const profile = await ensureProfile(data.user.id, data.user.email ?? email.trim(), fullName)
+    return { user: userFromProfile(data.user.id, profile), needsEmailConfirmation: false }
+  }
+
+  // Email confirmation required — user must click the link before signing in
+  return { user: null, needsEmailConfirmation: true }
+}
