@@ -1,10 +1,10 @@
 # KitaBooks — Multi-Tenant Accounting for Filipino Accountants
 
-A front-end starter for a multi-tenant accounting suite built for Philippine
-accountants (CPAs managing books for multiple clients). Built with
-React 19 + TypeScript + Vite.
+A multi-tenant accounting suite for Philippine accountants (CPAs managing books
+for multiple clients), built with React 19 + TypeScript + Vite and backed by
+Supabase (Postgres + Auth).
 
-## Features (front-end demo, mock data — no backend yet)
+## Features (Supabase auth + Postgres; book data still in-browser)
 
 - **Multi-tenant shell** — switch between client companies (books) with all
   data scoped per tenant.
@@ -38,20 +38,24 @@ React 19 + TypeScript + Vite.
 - **Peso formatting** — `en-PH` Intl currency formatting throughout.
 - Tenant metadata includes TIN, RDO code, VAT registration, fiscal year.
 
-## Demo access
+## Accounts & sign-in
 
-- **CPA app:** any email/password on the login screen signs you in as
-  `Maria Santos, CPA` (mock auth).
-- **Super Admin:** use the temporary credentials shown on the login page
-  (`superadmin@kitabooks.ph`).
+Auth runs on **Supabase** (email/password) whenever `.env.local` is configured,
+and falls back to an offline mock when it isn't.
 
-## Mock tenants
+- **CPA / Bookkeeper** — self-service: on the login page choose
+  *Create an account*, enter a name, email and password. The app auto-creates
+  the matching `profiles` row with the `cpa` role on first sign-in.
+- **Platform admin (Super Admin)** — sign in with the admin email configured in
+  `src/lib/auth.ts`; its profile is auto-promoted to the `superadmin` role.
+- Sessions are persisted by Supabase and restored on page reload.
 
-| Tenant | Industry | VAT |
-|---|---|---|
-| Manila Traders Corp. | Wholesale Trading | VAT (RDO 047) |
-| Cebu Consulting Services | Professional Services | VAT (RDO 085) |
-| Davao Delight Bakeshop | Food & Retail | Non-VAT (RDO 111) |
+## Fresh start (no seeded data)
+
+The app boots with **empty books everywhere** — no demo tenants, entries, sales,
+purchases, firms or audit events. Sign up, then use **Client Settings →
+Add New Client** (or the *Add Your First Client* prompt) and start recording
+real transactions.
 
 ## Run
 
@@ -60,12 +64,33 @@ npm install
 npm run dev
 ```
 
+### Supabase (database + auth)
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. Run `supabase/schema.sql` in the dashboard's **SQL Editor** (creates all
+   tables, helper functions, RLS policies — no seed data).
+3. Copy `.env.example` to `.env.local` and fill in the **Project URL** and
+   **anon public key** (Project Settings → API). `.env.local` is gitignored.
+4. Restart the dev server so Vite picks up the new env vars.
+
+Without step 3 the app still runs, but auth falls back to an offline mock and
+nothing reaches the database.
+
+### Platform admin user
+
+Create `rcmctaxconsultancy@gmail.com` under **Authentication → Users →
+Add user** with *Auto Confirm* enabled. On first sign-in the app creates its
+`profiles` row with the `superadmin` role automatically.
+
 ## Roadmap (next steps)
 
-- Backend with per-tenant data isolation (e.g. Supabase RLS or schema-per-tenant)
-  — moves platform settings, custom clients, and books from `localStorage`
-  to real cross-device persistence
-- Auth (CPA firm users ↔ client tenant memberships) — replaces the mock login
+- **Move book data to Supabase** — tenants, journal entries/lines, sales and
+  purchases currently live in React state + `localStorage`; migrate reads and
+  writes to the Postgres tables already defined in `supabase/schema.sql`
+- **Move platform settings to the DB** — so rebranding, maintenance mode and
+  signup flags apply to every user, not just the current browser
+- Firm management — CPA firms and staff membership (signups currently join a
+  placeholder firm)
 - Wire the Standard VAT Rate setting into VAT computations and BIR form output
 - Archive/remove clients from Client Settings
 - BIR form generation (2550M/Q, 1601C, 1604E, 2307)
