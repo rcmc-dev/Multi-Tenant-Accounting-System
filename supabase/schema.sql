@@ -2,18 +2,9 @@
 -- KitaBooks schema — run ONCE in the Supabase SQL Editor
 -- Matches src/types.ts: Tenant, JournalEntry/JournalLine, Sale, Purchase
 -- Safe to re-run: every statement is idempotent.
+-- NOTE: tables are created BEFORE the helper functions (Postgres validates
+-- SQL function bodies at creation time, so tables must exist first).
 -- =============================================================
-
--- ---------- helper functions (SECURITY DEFINER: bypass RLS to avoid recursion) ----------
-create or replace function my_role() returns text
-language sql stable security definer set search_path = public as $$
-  select role from profiles where id = auth.uid()
-$$;
-
-create or replace function my_firm_id() returns text
-language sql stable security definer set search_path = public as $$
-  select firm_id from profiles where id = auth.uid()
-$$;
 
 -- ---------- firms (CPA firms — the paying accounts) ----------
 create table if not exists firms (
@@ -108,6 +99,17 @@ create table if not exists platform_settings (
   allow_new_signups boolean not null default true,
   updated_at timestamptz not null default now()
 );
+
+-- ---------- helper functions (SECURITY DEFINER: bypass RLS to avoid recursion) ----------
+create or replace function my_role() returns text
+language sql stable security definer set search_path = public as $$
+  select role from profiles where id = auth.uid()
+$$;
+
+create or replace function my_firm_id() returns text
+language sql stable security definer set search_path = public as $$
+  select firm_id from profiles where id = auth.uid()
+$$;
 
 -- =============================================================
 -- Row Level Security
