@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { usePlatformSettings } from '../context/PlatformSettingsContext'
+import { SUPERADMIN_EMAIL, SUPERADMIN_TEMP_PASSWORD, signIn } from '../lib/auth'
+import type { AuthUser } from '../types'
 
-const SUPERADMIN_EMAIL = 'rcmctaxconsultancy@gmail.com'
-const SUPERADMIN_TEMP_PASSWORD = 'KitaAdmin#2026'
 const DEMO_CPA_EMAIL = 'maria@santoscpa.ph'
 const DEMO_CPA_PASSWORD = 'KitaDemo#2026'
 
@@ -10,30 +10,31 @@ export function LoginPage({
   onSuccess,
   onBack,
 }: {
-  onSuccess: (name: string, role: 'cpa' | 'superadmin') => void
+  onSuccess: (user: AuthUser) => void
   onBack: () => void
 }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
   const { settings } = usePlatformSettings()
 
-  const submit = (e2: React.FormEvent) => {
+  const submit = async (e2: React.FormEvent) => {
     e2.preventDefault()
     if (!email.trim() || !password.trim()) {
       setError('Please enter both email and password.')
       return
     }
-    if (email.trim().toLowerCase() === SUPERADMIN_EMAIL) {
-      if (password !== SUPERADMIN_TEMP_PASSWORD) {
-        setError('Invalid temporary password for the super admin account.')
-        return
-      }
-      onSuccess('Ramon Dela Cruz', 'superadmin')
-      return
+    setBusy(true)
+    setError(null)
+    try {
+      // Supabase when connected; offline mock otherwise (handled inside signIn)
+      onSuccess(await signIn(email, password))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Sign-in failed. Please try again.')
+    } finally {
+      setBusy(false)
     }
-    // Mock auth for CPA firms — real auth comes with the backend milestone.
-    onSuccess('Maria Santos, CPA', 'cpa')
   }
 
   const fillSuperAdmin = () => {
@@ -93,7 +94,9 @@ export function LoginPage({
             />
           </label>
           {error && <p className="mb-3 text-sm text-red-700">{error}</p>}
-          <button type="submit" className="btn-primary w-full py-2.5">Sign In</button>
+          <button type="submit" className="btn-primary w-full py-2.5" disabled={busy}>
+            {busy ? 'Signing in…' : 'Sign In'}
+          </button>
         </form>
 
         <div className="mt-5 rounded-xl border border-dashed border-brand-600 bg-brand-50 p-3.5 text-xs text-brand-900">
@@ -123,8 +126,8 @@ export function LoginPage({
         </div>
 
         <p className="mt-4 text-xs text-slate-400">
-          Demo auth: any other email/password signs you in as a CPA, too. Real authentication arrives with the
-          backend — the temp super admin password above should be rotated on first login.
+          With the backend connected the accounts above are real; without it, any email/password signs you
+          in as a CPA (offline demo). The temp super admin password should be rotated on first login.
         </p>
         </div>
       </div>

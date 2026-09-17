@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TenantProvider, useTenant } from './context/TenantContext'
+import { restoreSession, signOutUser } from './lib/auth'
+import type { AuthUser } from './types'
 import { Brand } from './components/Brand'
 import { AppShell } from './components/AppShell'
 import { MaintenanceScreen } from './components/MaintenanceScreen'
@@ -199,8 +201,41 @@ export default function App() {
 
 function AppRoot() {
   const { settings } = usePlatformSettings()
+  const [ready, setReady] = useState(false)
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [view, setView] = useState<View>('home')
-  const [userName, setUserName] = useState<string | null>(null)
+
+  // Restore a persisted Supabase session on load (offline demo mode: no-op)
+  useEffect(() => {
+    let active = true
+    restoreSession()
+      .then((restored) => {
+        if (!active || !restored) return
+        setUser(restored)
+        setView(restored.role === 'superadmin' ? 'superadmin' : 'app')
+      })
+      .finally(() => {
+        if (active) setReady(true)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const handleLogout = () => {
+    void signOutUser()
+    setUser(null)
+    setView('home')
+  }
+
+  // Brief splash while the session is being restored
+  if (!ready) {
+    return (
+      <div className="grid min-h-dvh place-items-center bg-brand-900">
+        <Brand />
+      </div>
+    )
+  }
 
   if (view === 'home') {
     return <HomePage onLogin={() => setView('login')} />
@@ -210,12 +245,9 @@ function AppRoot() {
   if (view === 'superadmin') {
     return (
       <SuperAdminShell
-        userName={userName ?? 'Ramon Dela Cruz'}
+        userName={user?.name ?? 'Ramon Dela Cruz'}
         onHome={() => setView('home')}
-        onLogout={() => {
-          setUserName(null)
-          setView('home')
-        }}
+        onLogout={handleLogout}
       />
     )
   }
@@ -225,12 +257,12 @@ function AppRoot() {
     return <MaintenanceScreen onBack={() => setView('home')} />
   }
 
-  if (view === 'login') {
+  if (view === 'login' || !user) {
     return (
       <LoginPage
-        onSuccess={(name, r) => {
-          setUserName(name)
-          setView(r === 'superadmin' ? 'superadmin' : 'app')
+        onSuccess={(u) => {
+          setUser(u)
+          setView(u.role === 'superadmin' ? 'superadmin' : 'app')
         }}
         onBack={() => setView('home')}
       />
@@ -238,8 +270,8 @@ function AppRoot() {
   }
 
   return (
-    <TenantProvider userName={userName ?? 'Maria Santos, CPA'}>
-      <Shell onHome={() => setView('home')} onLogout={() => { setUserName(null); setView('home') }} />
+    <TenantProvider userName={user.name}>
+      <Shell onHome={() => setView('home')} onLogout={handleLogout} />
     </TenantProvider>
   )
 }

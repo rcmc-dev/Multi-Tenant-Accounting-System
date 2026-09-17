@@ -46,6 +46,15 @@ export interface NewTenantInput {
   fiscalYearStart: string
 }
 
+/** Authenticated session user (Supabase-backed, or mock in offline demo mode) */
+export interface AuthUser {
+  id: string
+  name: string
+  role: 'cpa' | 'superadmin'
+  /** CPA firm this user belongs to (null for the platform admin) */
+  firmId: string | null
+}
+
 export interface TenantUser {
   name: string
   role: 'Admin' | 'Accountant' | 'Viewer'
