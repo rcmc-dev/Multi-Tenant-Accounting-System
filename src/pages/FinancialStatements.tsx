@@ -13,6 +13,7 @@ const Row = ({ label, amount, bold, indent }: { label: string; amount: number; b
 
 export function FinancialStatementsPage() {
   const { entries, tenant } = useTenant()
+  if (!tenant) return null
   const [view, setView] = useState<Statement>('trial-balance')
 
   const tb = getTrialBalance(entries)

@@ -5,6 +5,7 @@ import type { AuthUser } from './types'
 import { Brand } from './components/Brand'
 import { AppShell } from './components/AppShell'
 import { MaintenanceScreen } from './components/MaintenanceScreen'
+import { NewClientModal } from './components/NewClientModal'
 import { PlatformSettingsProvider, usePlatformSettings } from './context/PlatformSettingsContext'
 import { ClientSettingsPage } from './pages/ClientSettings'
 import { HomePage } from './pages/Home'
@@ -64,7 +65,7 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
           <span className="text-[0.7rem] tracking-widest uppercase">Client (Tenant)</span>
           <select
             className="cursor-pointer rounded-lg border border-brand-800 bg-brand-800 px-3 py-2 text-sm text-white"
-            value={tenant.id}
+            value={tenant?.id ?? ''}
             onChange={(e) => setTenantId(e.target.value)}
           >
             {tenants.map((t) => (
@@ -108,13 +109,19 @@ function Shell({ onHome, onLogout }: { onHome: () => void; onLogout: () => void 
       }
     >
       <main className="p-4 md:p-8">
-        {page === 'dashboard' && <DashboardPage />}
-        {page === 'journal' && <JournalEntriesPage />}
-        {page === 'sales' && <SalesPage />}
-        {page === 'purchases' && <PurchasesPage />}
-        {page === 'accounts' && <ChartOfAccountsPage />}
-        {page === 'statements' && <FinancialStatementsPage />}
-        {page === 'settings' && <ClientSettingsPage key={tenant.id} />}
+        {!tenant ? (
+          <NoClientsYet />
+        ) : (
+          <>
+            {page === 'dashboard' && <DashboardPage />}
+            {page === 'journal' && <JournalEntriesPage />}
+            {page === 'sales' && <SalesPage />}
+            {page === 'purchases' && <PurchasesPage />}
+            {page === 'accounts' && <ChartOfAccountsPage />}
+            {page === 'statements' && <FinancialStatementsPage />}
+            {page === 'settings' && <ClientSettingsPage key={tenant.id} />}
+          </>
+        )}
       </main>
     </AppShell>
   )
@@ -196,6 +203,26 @@ export default function App() {
     <PlatformSettingsProvider>
       <AppRoot />
     </PlatformSettingsProvider>
+  )
+}
+
+/** Shown until the workspace has at least one client book (fresh start) */
+function NoClientsYet() {
+  const [showNewClient, setShowNewClient] = useState(false)
+
+  return (
+    <div className="grid place-items-center py-24 text-center">
+      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-100 text-3xl">🏢</span>
+      <h1 className="mt-5 text-2xl font-bold">No client books yet</h1>
+      <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-500">
+        This workspace starts completely empty. Add your first client to open its books — dashboard,
+        journal, sales, purchases, and statements all live under each client.
+      </p>
+      <button className="btn-primary mt-6" onClick={() => setShowNewClient(true)}>
+        + Add Your First Client
+      </button>
+      {showNewClient && <NewClientModal onClose={() => setShowNewClient(false)} />}
+    </div>
   )
 }
 

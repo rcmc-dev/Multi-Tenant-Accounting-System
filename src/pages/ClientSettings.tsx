@@ -12,6 +12,7 @@ const formatTin = (raw: string) => {
 
 export function ClientSettingsPage() {
   const { tenant, updateTenant } = useTenant()
+  if (!tenant) return null
   const [showNewClient, setShowNewClient] = useState(false)
   const [name, setName] = useState(tenant.name)
   const [industry, setIndustry] = useState(tenant.industry)

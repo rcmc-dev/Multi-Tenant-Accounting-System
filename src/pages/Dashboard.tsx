@@ -3,6 +3,7 @@ import { formatPeso, getIncomeStatement, getVatSummary, getBalanceSheet } from '
 
 export function DashboardPage() {
   const { tenant, entries } = useTenant()
+  if (!tenant) return null
   const is = getIncomeStatement(entries)
   const vat = getVatSummary(entries)
   const bs = getBalanceSheet(entries)

@@ -6,6 +6,7 @@ import type { Sale } from '../types'
 
 export function SalesPage() {
   const { sales, addSale, tenant } = useTenant()
+  if (!tenant) return null
   const [showForm, setShowForm] = useState(false)
   const [invoiceNo, setInvoiceNo] = useState('SI-0001')
   const [date, setDate] = useState('2026-03-05')

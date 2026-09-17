@@ -13,6 +13,7 @@ const emptyLine = (): DraftLine => ({ key: nextKey++, accountCode: '', debit: 0,
 
 export function JournalEntriesPage() {
   const { entries, addEntry, tenant } = useTenant()
+  if (!tenant) return null
   const [showForm, setShowForm] = useState(false)
   const [date, setDate] = useState('2026-03-01')
   const [reference, setReference] = useState('JV-001')

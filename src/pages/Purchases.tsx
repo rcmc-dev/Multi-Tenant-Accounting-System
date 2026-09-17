@@ -6,6 +6,7 @@ import type { Purchase } from '../types'
 
 export function PurchasesPage() {
   const { purchases, addPurchase, tenant } = useTenant()
+  if (!tenant) return null
   const [showForm, setShowForm] = useState(false)
   const [refNo, setRefNo] = useState('PO-0001')
   const [date, setDate] = useState('2026-03-05')

@@ -177,13 +177,7 @@ insert into firms (id, name, plan)
 values ('f-santos', 'Santos & Co. CPAs', 'Firm')
 on conflict (id) do nothing;
 
-insert into tenants (id, firm_id, name, industry, tin, rdo_code, vat_type, fiscal_year_start, logo_initials, is_demo)
-values
-  ('manila-traders',  'f-santos', 'Manila Traders Corp.',     'Wholesale Trading',     '008-345-678-000', '047', 'vatable', '2026-01-01', 'MT', true),
-  ('cebu-consulting', 'f-santos', 'Cebu Consulting Services', 'Professional Services', '009-123-456-000', '085', 'vatable', '2026-01-01', 'CC', true),
-  ('davao-bakeshop',  'f-santos', 'Davao Delight Bakeshop',   'Food & Retail',         '010-567-890-000', '111', 'non-vat', '2026-04-01', 'DD', true)
-on conflict (id) do nothing;
-
+-- No tenant seed: every workspace starts with zero clients (fresh start).
 insert into platform_settings (id) values (1) on conflict (id) do nothing;
 
 -- NEXT STEPS (manual, in the Supabase dashboard):

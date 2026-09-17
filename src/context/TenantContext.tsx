@@ -1,11 +1,11 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { JournalEntry, NewTenantInput, Purchase, Sale, Tenant } from '../types'
 import { JOURNAL_ENTRIES, DEMO_TENANTS } from '../data/journalEntries'
 import { SALES, PURCHASES } from '../data/salesPurchases'
 import { saleToEntry, purchaseToEntry } from '../lib/postings'
 
 interface TenantContextValue {
-  tenant: Tenant
+  tenant: Tenant | null
   tenants: Tenant[]
   entries: JournalEntry[]
   sales: Sale[]
@@ -25,7 +25,7 @@ interface TenantContextValue {
 
 const TenantContext = createContext<TenantContextValue | null>(null)
 
-const CUSTOM_TENANTS_KEY = 'kitabooks.custom-tenants'
+const CUSTOM_TENANTS_KEY = 'kitabooks.custom-tenants.v2'
 
 /** Clients created in-app persist across reloads (demo-grade, localStorage) */
 function loadCustomTenants(): Tenant[] {
@@ -58,14 +58,21 @@ const slugFromName = (name: string) =>
   name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'client'
 
 export function TenantProvider({ children, userName }: { children: ReactNode; userName: string }) {
-  const [tenantId, setTenantId] = useState(DEMO_TENANTS[0].id)
-  // Demo books plus clients created in-app; edits to any client's details live here
+  // Fresh start: empty workspace; tenants are created in-app (Supabase-backed in Step 3)
+  const [tenantId, setTenantId] = useState('')
   const [tenants, setTenants] = useState<Tenant[]>(() => [...DEMO_TENANTS, ...loadCustomTenants()])
   const [allEntries, setAllEntries] = useState<Record<string, JournalEntry[]>>(JOURNAL_ENTRIES)
   const [allSales, setAllSales] = useState<Record<string, Sale[]>>(SALES)
   const [allPurchases, setAllPurchases] = useState<Record<string, Purchase[]>>(PURCHASES)
 
-  const tenant = tenants.find((t) => t.id === tenantId) ?? tenants[0]
+  const tenant = tenants.find((t) => t.id === tenantId) ?? null
+
+  // Auto-select the first tenant once any exist (fresh workspaces start with none)
+  useEffect(() => {
+    if (tenants.length > 0 && !tenants.some((t) => t.id === tenantId)) {
+      setTenantId(tenants[0].id)
+    }
+  }, [tenants, tenantId])
 
   const addEntry = useCallback(
     (entry: JournalEntry) => {
@@ -85,10 +92,10 @@ export function TenantProvider({ children, userName }: { children: ReactNode; us
       }))
       setAllEntries((prev) => ({
         ...prev,
-        [tenantId]: [...(prev[tenantId] ?? []), saleToEntry(sale, tenant.logoInitials)],
+        [tenantId]: [...(prev[tenantId] ?? []), saleToEntry(sale, tenant?.logoInitials ?? 'CL')],
       }))
     },
-    [tenantId, tenant.logoInitials],
+    [tenantId, tenant?.logoInitials],
   )
 
   const addPurchase = useCallback(
@@ -99,10 +106,10 @@ export function TenantProvider({ children, userName }: { children: ReactNode; us
       }))
       setAllEntries((prev) => ({
         ...prev,
-        [tenantId]: [...(prev[tenantId] ?? []), purchaseToEntry(purchase, tenant.logoInitials)],
+        [tenantId]: [...(prev[tenantId] ?? []), purchaseToEntry(purchase, tenant?.logoInitials ?? 'CL')],
       }))
     },
-    [tenantId, tenant.logoInitials],
+    [tenantId, tenant?.logoInitials],
   )
 
   const addTenant = useCallback((input: NewTenantInput): Tenant => {

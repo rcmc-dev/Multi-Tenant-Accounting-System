@@ -1,4 +1,4 @@
-import { AUDIT_EVENTS, MONTHLY_REVENUE, PLATFORM_FIRMS } from '../../data/platformData'
+import { AUDIT_EVENTS, MONTHLY_REVENUE, PLATFORM_FIRMS, PLATFORM_USERS } from '../../data/platformData'
 import { usePlatformSettings } from '../../context/PlatformSettingsContext'
 import { formatPeso } from '../../lib/accounting'
 
@@ -9,10 +9,10 @@ export function AdminDashboardPage() {
   const trialFirms = PLATFORM_FIRMS.filter((f) => f.status === 'trial').length
 
   const stats = [
-    { label: 'Monthly Recurring Revenue', value: formatPeso(totalMrr), sub: '+3.4% vs last month' },
+    { label: 'Monthly Recurring Revenue', value: formatPeso(totalMrr), sub: 'across active firms' },
     { label: 'Active Firms', value: String(activeFirms), sub: `${trialFirms} on trial` },
-    { label: 'Platform Users', value: '1,542', sub: 'across all firms' },
-    { label: 'Client Books (Tenants)', value: '66', sub: 'all firms combined' },
+    { label: 'Platform Users', value: String(PLATFORM_USERS.length), sub: 'across all firms' },
+    { label: 'Client Books (Tenants)', value: String(PLATFORM_FIRMS.reduce((s, f) => s + f.tenants, 0)), sub: 'all firms combined' },
   ]
 
   const maxRev = Math.max(...MONTHLY_REVENUE)
@@ -62,6 +62,7 @@ export function AdminDashboardPage() {
               </span>
             </div>
           ))}
+          {PLATFORM_FIRMS.length === 0 && <p className="m-0 text-sm text-slate-400">No firms yet.</p>}
         </div>
       </div>
 
@@ -77,6 +78,7 @@ export function AdminDashboardPage() {
             </span>
           </div>
         ))}
+        {AUDIT_EVENTS.length === 0 && <p className="m-0 text-sm text-slate-400">No activity yet.</p>}
       </div>
     </div>
   )
