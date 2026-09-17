@@ -1,8 +1,16 @@
 import { isSupabaseConfigured, supabase } from './supabase'
 import type { AuthUser } from '../types'
 
-export const SUPERADMIN_EMAIL = 'rcmctaxconsultancy@gmail.com'
-export const SUPERADMIN_TEMP_PASSWORD = 'KitaAdmin#2026'
+/**
+ * The platform admin is identified by email. Configurable via
+ * VITE_SUPERADMIN_EMAIL so the real address lives in the gitignored .env.local
+ * instead of being hardcoded in source control.
+ */
+export const SUPERADMIN_EMAIL = (
+  import.meta.env.VITE_SUPERADMIN_EMAIL ?? 'rcmctaxconsultancy@gmail.com'
+)
+  .trim()
+  .toLowerCase()
 
 /** New CPA signups join this demo firm until firm management ships */
 const DEMO_FIRM_ID = 'f-santos'
@@ -15,12 +23,13 @@ interface ProfileRow {
   firm_id: string | null
 }
 
-/** Offline demo sign-in — mirrors the pre-Supabase mock behavior */
-function mockSignIn(email: string, password: string): AuthUser {
+/**
+ * Offline fallback used only when Supabase isn't configured. It never checks
+ * passwords — no credentials belong in source control, and real verification
+ * always happens in Supabase.
+ */
+function mockSignIn(email: string): AuthUser {
   if (email.trim().toLowerCase() === SUPERADMIN_EMAIL) {
-    if (password !== SUPERADMIN_TEMP_PASSWORD) {
-      throw new Error('Invalid temporary password for the super admin account.')
-    }
     return { id: 'mock-superadmin', name: 'Ramon Dela Cruz', role: 'superadmin', firmId: null }
   }
   return { id: 'mock-cpa', name: 'Maria Santos, CPA', role: 'cpa', firmId: null }
@@ -67,7 +76,7 @@ function userFromProfile(userId: string, profile: ProfileRow): AuthUser {
 
 /** Signs in with Supabase when configured, or the offline mock otherwise */
 export async function signIn(email: string, password: string): Promise<AuthUser> {
-  if (!supabase) return mockSignIn(email, password)
+  if (!supabase) return mockSignIn(email)
   const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
   if (error || !data.user) throw new Error(friendlyAuthError(error?.message ?? 'Sign-in failed.'))
   const profile = await ensureProfile(data.user.id, email.trim())
@@ -113,7 +122,7 @@ function friendlySignUpError(message: string): string {
 
 /** Registers a new CPA/bookkeeper account (Supabase when configured; instant mock session otherwise) */
 export async function signUp(email: string, password: string, fullName: string): Promise<SignUpResult> {
-  if (!supabase) return { user: mockSignIn(email, password), needsEmailConfirmation: false }
+  if (!supabase) return { user: mockSignIn(email), needsEmailConfirmation: false }
 
   const { data, error } = await supabase.auth.signUp({
     email: email.trim(),
