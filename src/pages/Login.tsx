@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { usePlatformSettings } from '../context/PlatformSettingsContext'
-import { SUPERADMIN_EMAIL, SUPERADMIN_TEMP_PASSWORD, signIn, signUp } from '../lib/auth'
+import { signIn, signUp } from '../lib/auth'
 import type { AuthUser } from '../types'
-
-const DEMO_CPA_EMAIL = 'maria@santoscpa.ph'
-const DEMO_CPA_PASSWORD = 'KitaDemo#2026'
 
 export function LoginPage({
   onSuccess,
@@ -153,23 +150,6 @@ export function LoginPage({
             )}
           </p>
         ) : null}
-
-        <div className="mt-5 rounded-xl border border-dashed border-brand-600 bg-brand-50 p-3.5 text-xs text-brand-900">
-          <div className="font-bold">👤 CPA / Bookkeeper demo account</div>
-          <div className="mt-1 font-mono">Email: {DEMO_CPA_EMAIL}</div>
-          <div className="font-mono">Password: {DEMO_CPA_PASSWORD}</div>
-        </div>
-
-        <div className="mt-5 rounded-xl border border-dashed border-amber-400 bg-amber-50 p-3.5 text-xs text-amber-900">
-          <div className="font-bold">🔐 Super Admin (temporary access)</div>
-          <div className="mt-1 font-mono">Email: {SUPERADMIN_EMAIL}</div>
-          <div className="font-mono">Temp password: {SUPERADMIN_TEMP_PASSWORD}</div>
-        </div>
-
-        <p className="mt-4 text-xs text-slate-400">
-          With the backend connected the accounts above are real; without it, any email/password signs you
-          in as a CPA (offline demo). The temp super admin password should be rotated on first login.
-        </p>
         </div>
       </div>
     </div>
