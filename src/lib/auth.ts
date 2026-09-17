@@ -27,7 +27,9 @@ function mockSignIn(email: string, password: string): AuthUser {
 }
 
 function friendlyAuthError(message: string): string {
-  if (/invalid login credentials/i.test(message)) return 'Wrong email or password.'
+  if (/invalid login credentials/i.test(message)) {
+    return 'No confirmed account with those credentials yet. If this is the first sign-in, create the user in Supabase (Authentication → Users, auto-confirm) or double-check the password.'
+  }
   if (/email not confirmed/i.test(message)) return 'Please confirm your email first (check your inbox).'
   if (/rate limit/i.test(message)) return 'Too many attempts — wait a minute and try again.'
   return message
