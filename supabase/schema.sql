@@ -186,7 +186,7 @@ insert into platform_settings (id) values (1) on conflict (id) do nothing;
 
 -- NEXT STEPS (manual, in the Supabase dashboard):
 -- 1. Authentication -> Users -> Add user:
---    superadmin@kitabooks.ph (choose your password, auto-confirm).
+--    rcmctaxconsultancy@gmail.com (choose your password, auto-confirm).
 --    The app auto-creates its profile with the 'superadmin' role on first sign-in.
 -- 2. New CPA signups join the demo firm 'f-santos' until firm management ships.
 

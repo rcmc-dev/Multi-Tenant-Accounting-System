@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { usePlatformSettings } from '../context/PlatformSettingsContext'
 
-const SUPERADMIN_EMAIL = 'superadmin@kitabooks.ph'
+const SUPERADMIN_EMAIL = 'rcmctaxconsultancy@gmail.com'
 const SUPERADMIN_TEMP_PASSWORD = 'KitaAdmin#2026'
 const DEMO_CPA_EMAIL = 'maria@santoscpa.ph'
 const DEMO_CPA_PASSWORD = 'KitaDemo#2026'
