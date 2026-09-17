@@ -55,22 +55,6 @@ export function LoginPage({
     }
   }
 
-  const fillSuperAdmin = () => {
-    setEmail(SUPERADMIN_EMAIL)
-    setPassword(SUPERADMIN_TEMP_PASSWORD)
-    setError(null)
-    setNotice(null)
-    setMode('signin')
-  }
-
-  const fillDemoCpa = () => {
-    setEmail(DEMO_CPA_EMAIL)
-    setPassword(DEMO_CPA_PASSWORD)
-    setError(null)
-    setNotice(null)
-    setMode('signin')
-  }
-
   const fieldCls =
     'rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-normal text-slate-800 focus:outline-2 focus:outline-brand-600'
 
@@ -174,26 +158,12 @@ export function LoginPage({
           <div className="font-bold">👤 CPA / Bookkeeper demo account</div>
           <div className="mt-1 font-mono">Email: {DEMO_CPA_EMAIL}</div>
           <div className="font-mono">Password: {DEMO_CPA_PASSWORD}</div>
-          <button
-            type="button"
-            className="mt-2 cursor-pointer rounded-md bg-brand-600 px-2.5 py-1 font-semibold text-white hover:bg-brand-700"
-            onClick={fillDemoCpa}
-          >
-            Fill credentials for me
-          </button>
         </div>
 
         <div className="mt-5 rounded-xl border border-dashed border-amber-400 bg-amber-50 p-3.5 text-xs text-amber-900">
           <div className="font-bold">🔐 Super Admin (temporary access)</div>
           <div className="mt-1 font-mono">Email: {SUPERADMIN_EMAIL}</div>
           <div className="font-mono">Temp password: {SUPERADMIN_TEMP_PASSWORD}</div>
-          <button
-            type="button"
-            className="mt-2 cursor-pointer rounded-md bg-amber-400/60 px-2.5 py-1 font-semibold hover:bg-amber-400"
-            onClick={fillSuperAdmin}
-          >
-            Fill credentials for me
-          </button>
         </div>
 
         <p className="mt-4 text-xs text-slate-400">
