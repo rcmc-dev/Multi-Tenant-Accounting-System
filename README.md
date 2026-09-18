@@ -64,24 +64,6 @@ npm install
 npm run dev
 ```
 
-### Supabase (database + auth)
-
-1. Create a project at [supabase.com](https://supabase.com).
-2. Run `supabase/schema.sql` in the dashboard's **SQL Editor** (creates all
-   tables, helper functions, RLS policies — no seed data).
-3. Copy `.env.example` to `.env.local` and fill in the **Project URL** and
-   **anon public key** (Project Settings → API). `.env.local` is gitignored.
-4. Restart the dev server so Vite picks up the new env vars.
-
-Without step 3 the app still runs, but auth falls back to an offline mock and
-nothing reaches the database.
-
-### Platform admin user
-
-Create `rcmctaxconsultancy@gmail.com` under **Authentication → Users →
-Add user** with *Auto Confirm* enabled. On first sign-in the app creates its
-`profiles` row with the `superadmin` role automatically.
-
 ## Roadmap (next steps)
 
 - **Move book data to Supabase** — tenants, journal entries/lines, sales and
